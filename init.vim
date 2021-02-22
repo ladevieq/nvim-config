@@ -1,7 +1,6 @@
-let s:homeConfig = empty($XDG_CONFIG_HOME) ? $HOME . '/.config/nvim' : $XDG_CONFIG_HOME
-execute 'source ' . s:homeConfig . '/global-options.vim'
-execute 'source ' . s:homeConfig . '/plugins.vim'
-execute 'source ' . s:homeConfig . '/mappings.vim'
+execute 'source ' . stdpath('config') . '/global-options.vim'
+execute 'source ' . stdpath('config') . '/plugins.vim'
+execute 'source ' . stdpath('config') . '/mappings.vim'
 
 " Filetype specific
 autocmd Filetype c setlocal cc=81 
@@ -98,6 +97,8 @@ lspconfig.tsserver.setup        { on_attach = custom_on_attach }
 lspconfig.clangd.setup          { on_attach = custom_on_attach }
 
 lspconfig.rust_analyzer.setup   { on_attach = custom_on_attach }
+
+lspconfig.gopls.setup           { on_attach = custom_on_attach }
 
 lspconfig.efm.setup             {}
 
