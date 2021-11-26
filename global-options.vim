@@ -27,6 +27,9 @@ set undodir^=~/.vim/undo//
 " Always use utf-8 encoding
 set encoding=utf-8
 
+" Use unix end of line
+set fileformat=unix
+
 " Indentation
 set shiftwidth=4
 set softtabstop=4
@@ -129,3 +132,10 @@ set completeopt=menu,menuone,noinsert,noselect
 
 " Avoid showing message extra message when using completion
 set shortmess+=c
+
+if has("win32")
+    let &shell = has('win32') ? 'powershell' : 'pwsh'
+    set shellquote= shellpipe=\| shellxquote=
+    set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
+    set shellredir=\|\ Out-File\ -Encoding\ UTF8
+endif

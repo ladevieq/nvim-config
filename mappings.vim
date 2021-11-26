@@ -8,8 +8,8 @@ nnoremap k gk
 " Easier to escape the insert mode and terminal mode
 inoremap jk <Esc>
 inoremap kj <Esc>
-tnoremap jk <Esc>
-tnoremap kj <Esc>
+tnoremap jk <Esc> <C-\><C-n>
+tnoremap kj <Esc> <C-\><C-n>
 
 " Splits mappings
 noremap <leader>h <C-W><C-H>
