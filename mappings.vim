@@ -18,10 +18,6 @@ noremap <leader>k <C-W><C-K>
 noremap <leader>l <C-W><C-L>
 noremap <leader>t <C-W><C-T>
 
-" Use <Tab> and <S-Tab> to navigate through popup menu
-inoremap <expr> <Tab>           pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab>         pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
 " ----------------------------------
 "           fzf.vim
 " ----------------------------------

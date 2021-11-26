@@ -6,6 +6,10 @@ execute 'source ' . stdpath('config') . '/mappings.vim'
 autocmd Filetype c setlocal cc=81 
 autocmd Filetype cpp setlocal cc=81 
 
+augroup filetypedetect
+    au! BufRead,BufNewFile *.fx             setfiletype glsl
+augroup END
+
 let g:nvcode_termcolors=256
 colorscheme nvcode
 "
@@ -77,7 +81,7 @@ let g:fzf_preview_window = ['right:50%:hidden', 'ctrl-/']
 augroup LSP
     autocmd!
 
-    autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()
+    autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({ focusable = false })
 augroup END
 
 set omnifunc=v:lua.vim.lsp.omnifunc
@@ -87,20 +91,21 @@ lua << EOF
 
 local lspconfig = require("lspconfig")
 
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+
 function custom_on_attach(client, bufnr)
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
 end
 
-lspconfig.tsserver.setup        { on_attach = custom_on_attach }
-
-lspconfig.clangd.setup          { on_attach = custom_on_attach }
-
-lspconfig.rust_analyzer.setup   { on_attach = custom_on_attach }
-
-lspconfig.gopls.setup           { on_attach = custom_on_attach }
-
-lspconfig.efm.setup             {}
+local servers = { 'clangd', 'rust_analyzer', 'gopls', 'tsserver'} -- , 'efm' }
+for _, lsp in ipairs(servers) do
+    lspconfig[lsp].setup {
+        on_attach = custom_on_attach,
+        capabilities = capabilities,
+    }
+end
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -110,6 +115,72 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
         update_in_insert = true,
     }
 )
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+    vim.lsp.handlers.hover, {
+        focusable = false
+    }
+)
+
+EOF
+
+
+" ----------------------------------
+"           Completion
+" ----------------------------------
+lua << EOF
+
+local has_words_before = function()
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
+local feedkey = function(key, mode)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+end
+
+local cmp = require("cmp")
+
+cmp.setup {
+    sources = cmp.config.sources({
+        { name = 'vsnip' }, -- For vsnip users.
+        { name = 'nvim_lsp' },
+        { name = 'path' }
+    }),
+
+    snippet = {
+        -- REQUIRED - you must specify a snippet engine
+        expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        end,
+    },
+
+    completion = {
+        completeopt = 'menu,menuone,noinsert',
+    },
+
+    mapping = {
+        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item()
+            elseif vim.fn["vsnip#available"](1) == 1 then
+                feedkey("<Plug>(vsnip-expand-or-jump)", "")
+            elseif has_words_before() then
+                cmp.complete()
+            else
+                fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+            end
+        end, { "i", "s" }),
+
+        ["<S-Tab>"] = cmp.mapping(function()
+            if cmp.visible() then
+                cmp.select_prev_item()
+            elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+                feedkey("<Plug>(vsnip-jump-prev)", "")
+            end
+        end, { "i", "s" }),
+    },
+}
 
 EOF
 
