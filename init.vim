@@ -1,5 +1,5 @@
-execute 'source ' . stdpath('config') . '/global-options.vim'
 execute 'source ' . stdpath('config') . '/plugins.vim'
+execute 'source ' . stdpath('config') . '/global-options.vim'
 execute 'source ' . stdpath('config') . '/mappings.vim'
 
 " Filetype specific
@@ -81,7 +81,7 @@ let g:fzf_preview_window = ['right:50%:hidden', 'ctrl-/']
 augroup LSP
     autocmd!
 
-    autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({ focusable = false })
+    autocmd CursorHold * lua vim.diagnostic.open_float({ focusable = false })
 augroup END
 
 set omnifunc=v:lua.vim.lsp.omnifunc
