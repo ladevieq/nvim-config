@@ -28,7 +28,9 @@ set undodir^=~/.vim/undo//
 set encoding=utf-8
 
 " Use unix end of line
-set fileformat=unix
+if &modifiable
+    set fileformat=unix
+endif
 
 " Indentation
 set shiftwidth=4
@@ -115,15 +117,10 @@ set updatetime=300
 set clipboard=unnamedplus
 
 syntax on
-set t_Co=256
+
+set termguicolors
 
 filetype plugin on
-
-" Enable true colors when available
-if (has("termguicolors"))
-    set termguicolors
-    hi LineNr ctermbg=NONE guibg=NONE
-endif
 
 set virtualedit=block
 

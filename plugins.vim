@@ -8,9 +8,10 @@ endif
 
 call plug#begin(stdpath('data') . '/plugged')
 
-Plug 'ChristianChiarulli/nvcode-color-schemes.vim'
+Plug 'Mofiqul/vscode.nvim'
 
 Plug 'machakann/vim-sandwich'
+Plug 'windwp/nvim-autopairs'
 
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'  " to enable preview (optional)
@@ -22,11 +23,13 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
-
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
 
-Plug 'itchyny/lightline.vim'
+Plug 'nvim-lualine/lualine.nvim'
+
+Plug 'nvim-lua/plenary.nvim'
+Plug 'jose-elias-alvarez/null-ls.nvim'
 
 call plug#end()
 

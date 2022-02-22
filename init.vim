@@ -2,33 +2,16 @@ execute 'source ' . stdpath('config') . '/plugins.vim'
 execute 'source ' . stdpath('config') . '/global-options.vim'
 execute 'source ' . stdpath('config') . '/mappings.vim'
 
-" Filetype specific
-autocmd Filetype c setlocal cc=81 
-autocmd Filetype cpp setlocal cc=81 
-
 augroup filetypedetect
     au! BufRead,BufNewFile *.fx             setfiletype glsl
 augroup END
 
-let g:nvcode_termcolors=256
-colorscheme nvcode
-"
-" lightline colorscheme
-let g:lightline = {
-      \ 'colorscheme': 'solarized',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ }
+let g:vscode_style = "dark"
+colorscheme vscode
 
 " ----------------------------------
 "           fzf.vim
 " ----------------------------------
-
-lua << EOF
-require('lspfuzzy').setup {}
-EOF
 
 " An action can be a reference to a function that processes selected lines
 function! s:build_quickfix_list(lines)
@@ -91,21 +74,31 @@ lua << EOF
 
 local lspconfig = require("lspconfig")
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 function custom_on_attach(client, bufnr)
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
 end
 
-local servers = { 'clangd', 'rust_analyzer', 'gopls', 'tsserver'} -- , 'efm' }
+local servers = { 'clangd', 'rust_analyzer', 'gopls'}
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = custom_on_attach,
         capabilities = capabilities,
     }
 end
+
+-- Disable tsserver formating
+lspconfig['tsserver'].setup {
+    on_attach = function(client, bufnr)
+        custom_on_attach(client, bufnr)
+
+        client.resolved_capabilities.document_formatting = false
+        client.resolved_capabilities.document_range_formatting = false
+    end,
+    capabilities = capabilities,
+}
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -121,13 +114,10 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     }
 )
 
-EOF
 
-
-" ----------------------------------
-"           Completion
-" ----------------------------------
-lua << EOF
+-- ----------------------------------
+--           Completion
+-- ----------------------------------
 
 local has_words_before = function()
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -171,7 +161,6 @@ cmp.setup {
                 fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
             end
         end, { "i", "s" }),
-
         ["<S-Tab>"] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_prev_item()
@@ -182,13 +171,10 @@ cmp.setup {
     },
 }
 
-EOF
 
-
-" ----------------------------------
-"           Treesitter
-" ----------------------------------
-lua <<EOF
+-- ----------------------------------
+--           Treesitter
+-- ----------------------------------
 
 require'nvim-treesitter.configs'.setup {
     ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
@@ -200,4 +186,52 @@ require'nvim-treesitter.configs'.setup {
     },
 }
 
+
+require('lspfuzzy').setup {}
+
+
+-- ----------------------------------
+--           null-ls
+-- ----------------------------------
+
+require("null-ls").setup({
+    sources = {
+        require("null-ls").builtins.formatting.eslint,
+        require("null-ls").builtins.diagnostics.eslint,
+    },
+    on_attach = function(client)
+        if client.resolved_capabilities.document_formatting then
+            vim.cmd([[
+            augroup LspFormatting
+                autocmd! * <buffer>
+                autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+            augroup END
+            ]])
+        end
+    end,
+})
+
+
+require('lualine').setup {
+    options = {
+        icons_enabled = false,
+        theme = 'solarized_dark',
+    },
+    sections = {
+        lualine_a = {'mode'},
+        lualine_b = {'branch'},
+        lualine_c = {'filename'},
+        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_y = {'progress'},
+        lualine_z = {'location'}
+    },
+    tabline = {
+        lualine_a = {'buffers'},
+        lualine_b = {},
+        lualine_c = {},
+        lualine_x = {},
+        lualine_y = {},
+        lualine_z = {}
+    }
+}
 EOF
