@@ -60,20 +60,17 @@ let g:fzf_preview_window = ['right:50%:hidden', 'ctrl-/']
 "           Nvim LSP client
 " ----------------------------------
 
-" Mappings
 augroup LSP
     autocmd!
 
-    autocmd CursorHold * lua vim.diagnostic.open_float({ focusable = false })
+    autocmd CursorHold * lua vim.diagnostic.open_float()
 augroup END
 
 set omnifunc=v:lua.vim.lsp.omnifunc
 
-" Servers setup
 lua << EOF
 
 local lspconfig = require("lspconfig")
-
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 function custom_on_attach(client, bufnr)
@@ -100,14 +97,13 @@ lspconfig['tsserver'].setup {
     capabilities = capabilities,
 }
 
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics, {
-        underline = true,
-        virtual_text = false,
-        signs = true,
-        update_in_insert = true,
+vim.diagnostic.config {
+    update_in_insert = true,
+    float = {
+        focusable = false
     }
-)
+}
+
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
     vim.lsp.handlers.hover, {
         focusable = false
@@ -136,18 +132,15 @@ cmp.setup {
         { name = 'nvim_lsp' },
         { name = 'path' }
     }),
-
     snippet = {
         -- REQUIRED - you must specify a snippet engine
         expand = function(args)
             vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
         end,
     },
-
     completion = {
         completeopt = 'menu,menuone,noinsert',
     },
-
     mapping = {
         ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ["<Tab>"] = cmp.mapping(function(fallback)
