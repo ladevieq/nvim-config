@@ -76,6 +76,15 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protoco
 function custom_on_attach(client, bufnr)
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
+
+    if client.resolved_capabilities.document_formatting then
+        vim.cmd([[
+        augroup LspFormatting
+            autocmd! * <buffer>
+            autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+        augroup END
+        ]])
+    end
 end
 
 local servers = { 'clangd', 'rust_analyzer', 'gopls'}
@@ -89,10 +98,10 @@ end
 -- Disable tsserver formating
 lspconfig['tsserver'].setup {
     on_attach = function(client, bufnr)
-        custom_on_attach(client, bufnr)
-
         client.resolved_capabilities.document_formatting = false
         client.resolved_capabilities.document_range_formatting = false
+
+        custom_on_attach(client, bufnr)
     end,
     capabilities = capabilities,
 }
@@ -187,10 +196,11 @@ require('lspfuzzy').setup {}
 --           null-ls
 -- ----------------------------------
 
-require("null-ls").setup({
+local null_ls = require("null-ls")
+null_ls.setup({
     sources = {
-        require("null-ls").builtins.formatting.eslint,
-        require("null-ls").builtins.diagnostics.eslint,
+        null_ls.builtins.formatting.eslint,
+        null_ls.builtins.diagnostics.eslint,
     },
     on_attach = function(client)
         if client.resolved_capabilities.document_formatting then
@@ -233,4 +243,14 @@ require('lualine').setup {
         lualine_z = {}
     }
 }
+EOF
+
+
+" ----------------------------------
+"           Neogit
+" ----------------------------------
+lua <<EOF
+
+require('neogit').setup {}
+
 EOF
