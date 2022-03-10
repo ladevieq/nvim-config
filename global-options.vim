@@ -29,7 +29,7 @@ set encoding=utf-8
 
 " Use unix end of line
 if &modifiable
-    set fileformat=unix
+    set fileformats=unix,dos
 endif
 
 " Indentation
