@@ -1,6 +1,6 @@
-execute 'source ' . stdpath('config') . '/plugins.vim'
-execute 'source ' . stdpath('config') . '/global-options.vim'
-execute 'source ' . stdpath('config') . '/mappings.vim'
+execute 'source ' . stdpath('config') . '\plugins.vim'
+execute 'source ' . stdpath('config') . '\global-options.vim'
+execute 'source ' . stdpath('config') . '\mappings.vim'
 
 augroup filetypedetect
     au! BufRead,BufNewFile *.fx             setfiletype glsl
@@ -104,6 +104,13 @@ lspconfig['tsserver'].setup {
         custom_on_attach(client, bufnr)
     end,
     capabilities = capabilities,
+}
+
+-- on Windows
+local pid = vim.fn.getpid()
+local omnisharp_bin = "C:\\Program Files\\omnisharp\\OmniSharp.exe"
+lspconfig['omnisharp'].setup{
+    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) };
 }
 
 vim.diagnostic.config {

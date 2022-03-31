@@ -1,12 +1,10 @@
-let s:homeData = empty($XDG_DATA_HOME) ? $HOME . '/.local/share' : $XDG_DATA_HOME
-let s:vimPlugPath = s:homeData . '/nvim/site/autoload/plug.vim'
+let plug_path = stdpath('data').'\site\autoload\plug.vim'
 
-if empty(glob(s:vimPlugPath))
-    echo s:vimPlugPath
-    execute 'silent !curl -fLo ' . s:vimPlugPath . ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+if empty(glob(plug_path))
+    execute 'silent !curl -fLo '.plug_path.' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 endif
 
-call plug#begin(stdpath('data') . '/plugged')
+call plug#begin()
 
 Plug 'Mofiqul/vscode.nvim'
 
@@ -41,4 +39,3 @@ call plug#end()
 autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
   \| PlugInstall --sync | source $MYVIMRC
 \| endif
-
