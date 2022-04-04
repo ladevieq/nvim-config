@@ -1,89 +1,89 @@
-execute 'source ' . stdpath('config') . '\plugins.vim'
-execute 'source ' . stdpath('config') . '\global-options.vim'
-execute 'source ' . stdpath('config') . '\mappings.vim'
-
-augroup filetypedetect
-    au! BufRead,BufNewFile *.fx             setfiletype glsl
-augroup END
-
-let g:vscode_style = "dark"
-colorscheme vscode
-
-" ----------------------------------
-"           fzf.vim
-" ----------------------------------
-
-" An action can be a reference to a function that processes selected lines
-function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-  copen
-  cc
-endfunction
-
-let g:fzf_action = {
-  \ 'ctrl-q': function('s:build_quickfix_list'),
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
-
-" Make ag match files content only, not filenames
-command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, {'options': '--delimiter : --nth 4..'}, <bang>0)
-
-
-" Customize fzf colors to match your color scheme
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'Ignore'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
-
-
-" [Buffers] Jump to the existing window if possible
-let g:fzf_buffers_jump = 1
-let g:fzf_layout = { 'window': { 'yoffset': 0.85, 'width': 0.9, 'height': 0.6 } }
-let g:fzf_preview_window = ['right:50%:hidden', 'ctrl-/']
-
-" ----------------------------------
-"           ! fzf.vim
-" ----------------------------------
-
-" ----------------------------------
-"           Nvim LSP client
-" ----------------------------------
-
-augroup LSP
-    autocmd!
-
-    autocmd CursorHold * lua vim.diagnostic.open_float()
-augroup END
-
-set omnifunc=v:lua.vim.lsp.omnifunc
-
 lua << EOF
+
+vim.cmd('source ' .. vim.fn.stdpath('config') .. '/plugins.vim')
+vim.cmd('source ' .. vim.fn.stdpath('config') .. '/global-options.vim')
+vim.cmd('source ' .. vim.fn.stdpath('config') .. '/mappings.vim')
+
+local FTDetectGroup = vim.api.nvim_create_augroup("filetypedetect", { clear = true })
+vim.api.nvim_create_autocmd(
+    { "BufRead", "BufNewFile" },
+    { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx" }}
+)
+
+local global = vim.g
+global.vscode_style = "dark"
+
+vim.cmd([[ colorscheme vscode ]])
+
+-- ----------------------------------
+--           fzf.vim
+-- ----------------------------------
+
+-- An action can be a reference to a function that processes selected lines
+local build_quickfix_list = function(lines)
+    vim.fn.setqflist(vim.fn.map(vim.fn.copy(lines), '{ "filename": vim.v.val }'))
+    vim.cmd 'copen'
+    vim.cmd 'cc'
+end
+
+global.fzf_action = {
+   ['ctrl-q'] = 'call build_quickfix_list',
+   ['ctrl-t'] = 'tab split',
+   ['ctrl-x'] = 'split',
+   ['ctrl-v'] = 'vsplit'
+}
+
+-- Make ag match files content only, not filenames
+-- vim.cmd 'command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { options = "--delimiter : --nth 4.."}, <bang>0)'
+-- vim.call('fzf#vim#ag', { '<q-args>', { options = "--delimiter : --nth 4.."}, '<bang>0' })
+
+
+-- Customize fzf colors to match your color scheme
+global.fzf_colors = {
+    ['fg'] =        { 'fg', 'Normal' },
+    ['bg'] =        { 'bg', 'Normal' },
+    ['hl'] =        { 'fg', 'Comment' },
+    ['fg+'] =       { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
+    ['bg+'] =       { 'bg', 'CursorLine', 'CursorColumn' },
+    ['hl+'] =       { 'fg', 'Statement' },
+    ['info'] =      { 'fg', 'PreProc' },
+    ['border'] =    { 'fg', 'Ignore' },
+    ['prompt'] =    { 'fg', 'Conditional' },
+    ['pointer'] =   { 'fg', 'Exception' },
+    ['marker'] =    { 'fg', 'Keyword' },
+    ['spinner'] =   { 'fg', 'Label' },
+    ['header'] =    { 'fg', 'Comment' }
+}
+
+
+-- [Buffers] Jump to the existing window if possible
+global.fzf_buffers_jump = true
+global.fzf_layout = { window = { yoffset = 0.85, width = 0.9, height = 0.6 } }
+global.fzf_preview_window = { 'right:50%:hidden', 'ctrl-/' }
+
+-- ----------------------------------
+--           ! fzf.vim
+-- ----------------------------------
+
+-- ----------------------------------
+--           Nvim LSP client
+-- ----------------------------------
+
+local CursorHoldGroup = vim.api.nvim_create_augroup("LSP", { clear = true })
+vim.api.nvim_create_autocmd("CursorHold", { command = "lua vim.diagnostic.open_float()", group = CursorHoldGroup, pattern = { "*" }})
 
 local lspconfig = require("lspconfig")
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 function custom_on_attach(client, bufnr)
+    vim.opt.omnifunc = 'vim.lsp.omnifunc'
+
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
 
     if client.resolved_capabilities.document_formatting then
-        vim.cmd([[
-        augroup LspFormatting
-            autocmd! * <buffer>
-            autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
-        augroup END
-        ]])
+        local LSPFormattingGroup = vim.api.nvim_create_augroup("LSPFormatting")
+        vim.api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 end
 
@@ -213,12 +213,8 @@ null_ls.setup({
     },
     on_attach = function(client)
         if client.resolved_capabilities.document_formatting then
-            vim.cmd([[
-            augroup LspFormatting
-                autocmd! * <buffer>
-                autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
-            augroup END
-            ]])
+	    local LSPFormattingGroup = vim.api.nvim_create_augroup("LSPFormatting", { clear = true })
+            vim.api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
         end
     end,
 })
