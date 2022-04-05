@@ -34,9 +34,7 @@ global.fzf_action = {
 }
 
 -- Make ag match files content only, not filenames
--- vim.cmd 'command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { options = "--delimiter : --nth 4.."}, <bang>0)'
--- vim.call('fzf#vim#ag', { '<q-args>', { options = "--delimiter : --nth 4.."}, '<bang>0' })
-
+vim.cmd(":command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)")
 
 -- Customize fzf colors to match your color scheme
 global.fzf_colors = {
