@@ -1,35 +1,35 @@
-" Set leader key
-let mapleader = " "
-
-" Go down/up in wrapped lines
-nnoremap j gj
-nnoremap k gk
-
-" Easier to escape the insert mode and terminal mode
-inoremap jk <Esc>
-inoremap kj <Esc>
-tnoremap jk <Esc> <C-\><C-n>
-tnoremap kj <Esc> <C-\><C-n>
-
-" Splits mappings
-noremap <leader>h <C-W><C-H>
-noremap <leader>j <C-W><C-J>
-noremap <leader>k <C-W><C-K>
-noremap <leader>l <C-W><C-L>
-noremap <leader>t <C-W><C-T>
-
-" ----------------------------------
-"           fzf.vim
-" ----------------------------------
-nnoremap <leader>/ :Ag<cr>
-nnoremap <leader>f :Files<cr>
-nnoremap <leader>b :Buffers<cr>
-
-
-" ----------------------------------
-"           lsp client
-" ----------------------------------
 lua << EOF
+
+-- Set leader key
+vim.g.mapleader = ' '
+
+local api = vim.api
+
+-- Go down/up in wrapped lines
+api.nvim_set_keymap('n', 'j', 'gj', {})
+api.nvim_set_keymap('n', 'k', 'gk', {})
+
+-- Easier to escape the insert mode and terminal mode
+api.nvim_set_keymap('i', 'jk', '<Esc>', {})
+api.nvim_set_keymap('i', 'kj', '<Esc>', {})
+
+-- Splits mappings
+api.nvim_set_keymap('n', '<leader>h', '<C-W><C-H>', {})
+api.nvim_set_keymap('n', '<leader>j', '<C-W><C-J>', {})
+api.nvim_set_keymap('n', '<leader>k', '<C-W><C-K>', {})
+api.nvim_set_keymap('n', '<leader>l', '<C-W><C-L>', {})
+api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
+
+-- ----------------------------------
+--           fzf.vim
+-- ----------------------------------
+api.nvim_set_keymap('n', '<leader>/', ':Ag<cr>', {})
+api.nvim_set_keymap('n', '<leader>f', ':Files<cr>', {})
+api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
+
+-- ----------------------------------
+--           lsp client
+-- ----------------------------------
 function _G.bufferLspMappings(client, bufnr)
     local opts = { noremap=true, silent=true }
     vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn',   '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
