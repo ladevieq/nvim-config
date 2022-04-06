@@ -222,6 +222,7 @@ require('lualine').setup {
     options = {
         icons_enabled = false,
         theme = 'solarized_dark',
+        globalstatus = true,
     },
     sections = {
         lualine_a = {'mode'},

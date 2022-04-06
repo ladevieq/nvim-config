@@ -1,138 +1,128 @@
-set runtimepath^=~/.vim runtimepath+=~/.vim/after
+lua << EOF
 
-" Save and backup
-" Protect changes between writes. Default values of
-" updatecount (200 keystrokes) and updatetime
-" (4 seconds) are fine
-set swapfile
-set directory^=~/.vim/swap//
+local set = vim.opt
 
-" protect against crash-during-write
-set writebackup
-" but do not persist backup after successful write
-set nobackup
-" use rename-and-write-new method whenever safe
-set backupcopy=auto
-" patch required to honor double slash at end
-if has("patch-8.1.0251")
-    " consolidate the writebackups -- not a big
-    " deal either way, since they usually get deleted
-    set backupdir^=~/.vim/backup//
+-- Save and backup
+-- Protect changes between writes. Default values of
+-- updatecount (200 keystrokes) and updatetime
+-- (4 seconds) are fine
+set.swapfile = true
+
+-- protect against crash-during-write
+set.writebackup = true
+-- but do not persist backup after successful write
+set.backup = false
+-- use rename-and-write-new method whenever safe
+set.backupcopy = 'auto'
+
+-- persist the undo tree for each file
+set.undofile = true
+
+-- Always use utf-8 encoding
+set.encoding = 'utf-8'
+
+-- Use unix end of line
+if set.modifiable:get() then
+    set.fileformats = { 'unix', 'dos' }
 end
 
-" persist the undo tree for each file
-set undofile
-set undodir^=~/.vim/undo//
+-- Indentation
+set.shiftwidth = 4
+set.softtabstop = 4
+set.expandtab = true
+set.autoindent = true
 
-" Always use utf-8 encoding
-set encoding=utf-8
+-- vim.cmd 'filetype plugin on'
+vim.cmd('filetype plugin indent on')
+-- vim.g.do_filetype_lua = 1
+-- vim.g.did_load_filetypes = 0
 
-" Use unix end of line
-if &modifiable
-    set fileformats=unix,dos
-endif
+-- Display location hints
+set.number = true
+set.relativenumber = true
+set.cursorline = true
 
-" Indentation
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set autoindent
+-- Visual hints
+set.list = true
+set.listchars = { tab = '>-', space = '·', eol = '¬' }
+set.backspace = { 'indent', 'eol', 'start' }
 
-filetype plugin indent on
+-- Gui
+if vim.fn.has('gui_running') == 1 then
+    -- start maximised
+    local MaximiseGroup = vim.api.nvim_create_augroup("MaximiseGroup", { clear = true })
+    vim.api.nvim_create_autocmd("GUIEnter", { command = "simalt ~x", group = MaximiseGroup, pattern = { "*" } })
 
-" Display location hints
-set number
-set relativenumber
-set cursorline
-
-" Visual hints
-set list
-set lcs=tab:>-,space:·,eol:¬
-set backspace=indent,eol,start
-
-" Gui
-if has('gui_running')
-    " start maximised
-    au GUIEnter * simalt ~x
-
-    if has("win32")
-        set renderoptions=type:directx
-        set guifont=Fira\ Code:h12
+    if vim.fn.has('win32') == 1 then
+        set.renderoptions = 'type:directx'
+        set.guifont = 'Fira Code:h12'
     else
-        set guifont=Fira\ Code\ 12
-    endif
-    set guioptions-=m  "remove menubar
-    set guioptions-=T  "remove toolbar
-    set guioptions-=r  "remove right-hand scroll bar
-    set guioptions-=L  "remove left-hand scroll bar
-endif
+        set.guifont = 'Fira Code 12'
+    end
+    set.guioptions.remove('m', 'T', 'r', 'L')  -- remove menubar, toolbar, right-hand & left-hand scroll bar
+end
 
-set path+=**
-set mouse+=a
-set wildmenu
-set splitbelow
-set splitright
+set.path:append('**')
+set.mouse:append('a')
+set.wildmenu = true
+set.splitbelow = true
+set.splitright = true
 
-set autoread
+set.autoread = true
 
-" Better display for messages
-set cmdheight=2
+-- Better display for messages
+set.cmdheight = 2
 
-" always show signcolumns
-set signcolumn=yes
+-- always show signcolumns
+set.signcolumn = 'yes'
 
-" Hide mode
-set noshowmode
+-- Hide mode
+set.showmode = false
 
-" Search
-set incsearch
-set hlsearch
+-- Search
+set.incsearch = true
+set.hlsearch = true
 
-set scrolloff=10 " show lines above and below cursor
+set.scrolloff = 10 -- show lines above and below cursor
 
-" Note, perl automatically sets foldmethod in the syntax file
-" autocmd Syntax c,cpp,json,xml,html,js,vue setlocal foldmethod=syntax
-" autocmd Syntax c,cpp,json,xml,html,js,vue normal zR
-set nofoldenable
+-- Note, perl automatically sets foldmethod in the syntax file
+-- autocmd Syntax c,cpp,json,xml,html,js,vue setlocal foldmethod=syntax
+-- autocmd Syntax c,cpp,json,xml,html,js,vue normal zR
+set.foldenable = false
 
-" Change diff algorithm
-if &diff
-    set diffopt=filler,context:99999999
-    set fillchars+=diff:\ ,
-    set norelativenumber
+-- Change diff algorithm
+if set.diff:get() then
+    set.diffopt = 'filler, context:99999999'
+    set.fillchars:append('diff: ,')
+    set.relativenumber = false
 
-    if has("patch-8.1.0360")
-        set diffopt+=internal,algorithm:patience
-    endif
-endif
+    if vim.fn.has("patch-8.1.0360") == 1 then
+        set.diffopt:append('internal,algorithm:patience')
+    end
+end
 
-" Timeouts
-set timeout
-set timeoutlen=250
-set ttimeout
-set ttimeoutlen=100
-set updatetime=300
+-- Timeouts
+set.timeout = true
+set.timeoutlen = 250
+set.ttimeout = true
+set.ttimeoutlen = 100
+set.updatetime = 300
 
-" Use system clipboard
-set clipboard=unnamedplus
+-- Use system clipboard
+set.clipboard = 'unnamedplus'
 
-syntax on
+vim.cmd [[
+  syntax on
+]]
 
-set termguicolors
+set.termguicolors = true
 
-filetype plugin on
+set.virtualedit = block
 
-set virtualedit=block
+-- Set completeopt to have a better completion experience
+set.completeopt = { menu, menuone, noinsert, noselect }
 
-" Set completeopt to have a better completion experience
-set completeopt=menu,menuone,noinsert,noselect
+-- Avoid showing message extra message when using completion
+set.shortmess:append('c')
 
-" Avoid showing message extra message when using completion
-set shortmess+=c
-
-if has("win32")
-    let &shell = has('win32') ? 'powershell' : 'pwsh'
-    set shellquote= shellpipe=\| shellxquote=
-    set shellcmdflag=-NoLogo\ -NoProfile\ -ExecutionPolicy\ RemoteSigned\ -Command
-    set shellredir=\|\ Out-File\ -Encoding\ UTF8
-endif
+EOF

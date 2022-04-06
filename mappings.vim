@@ -31,7 +31,7 @@ api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 --           lsp client
 -- ----------------------------------
 function _G.bufferLspMappings(client, bufnr)
-    local opts = { noremap=true, silent=true }
+    local opts = { noremap = true, silent = true }
     vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn',   '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd',           '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K',            '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
