@@ -1,10 +1,8 @@
-lua << EOF
+require('plugins')
+require('global-options')
+require('mappings')
 
-vim.cmd('source ' .. vim.fn.stdpath('config') .. '/plugins.vim')
-vim.cmd('source ' .. vim.fn.stdpath('config') .. '/global-options.vim')
-vim.cmd('source ' .. vim.fn.stdpath('config') .. '/mappings.vim')
-
-local FTDetectGroup = vim.api.nvim_create_augroup("filetypedetect", { clear = true })
+local FTDetectGroup = vim.api.nvim_create_augroup("FTDetect", { clear = true })
 vim.api.nvim_create_autocmd(
     { "BufRead", "BufNewFile" },
     { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx" }}
@@ -256,5 +254,3 @@ require('nvim-autopairs').setup {}
 -- ----------------------------------
 
 require('neogit').setup {}
-
-EOF

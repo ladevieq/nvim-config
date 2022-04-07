@@ -1,5 +1,3 @@
-lua << EOF
-
 local set = vim.opt
 
 -- Save and backup
@@ -32,10 +30,8 @@ set.softtabstop = 4
 set.expandtab = true
 set.autoindent = true
 
--- vim.cmd 'filetype plugin on'
-vim.cmd('filetype plugin indent on')
--- vim.g.do_filetype_lua = 1
--- vim.g.did_load_filetypes = 0
+vim.g.do_filetype_lua = 1
+vim.g.did_load_filetypes = 0
 
 -- Display location hints
 set.number = true
@@ -85,9 +81,6 @@ set.hlsearch = true
 
 set.scrolloff = 10 -- show lines above and below cursor
 
--- Note, perl automatically sets foldmethod in the syntax file
--- autocmd Syntax c,cpp,json,xml,html,js,vue setlocal foldmethod=syntax
--- autocmd Syntax c,cpp,json,xml,html,js,vue normal zR
 set.foldenable = false
 
 -- Change diff algorithm
@@ -111,9 +104,7 @@ set.updatetime = 300
 -- Use system clipboard
 set.clipboard = 'unnamedplus'
 
-vim.cmd [[
-  syntax on
-]]
+vim.cmd 'syntax on'
 
 set.termguicolors = true
 
@@ -124,5 +115,3 @@ set.completeopt = { menu, menuone, noinsert, noselect }
 
 -- Avoid showing message extra message when using completion
 set.shortmess:append('c')
-
-EOF

@@ -1,5 +1,3 @@
-lua << EOF
-
 local plug_path = vim.fn.stdpath('data') .. '/site/autoload/plug.vim'
 
 if vim.fn.empty(vim.fn.glob(plug_path)) == 1 then
@@ -53,5 +51,3 @@ vim.api.nvim_create_autocmd(
         pattern = { "*" }
     }
 )
-
-EOF

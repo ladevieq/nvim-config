@@ -1,5 +1,3 @@
-lua << EOF
-
 -- Set leader key
 vim.g.mapleader = ' '
 
@@ -48,4 +46,3 @@ function _G.bufferLspMappings(client, bufnr)
     -- Restart client
     vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rr',   '<cmd>lua vim.lsp.stop_client(vim.lsp.get_active_clients())<CR>', opts)
 end
-EOF
