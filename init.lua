@@ -74,14 +74,14 @@ local lspconfig = require("lspconfig")
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 function custom_on_attach(client, bufnr)
-    api.nvim_buf_set_option(bufnrm, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
 
     if client.resolved_capabilities.document_formatting then
-        local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting")
-        api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
+        local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting", {})
+        api.nvim_create_autocmd("BufWritePre", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 end
 
@@ -107,8 +107,9 @@ lspconfig['tsserver'].setup {
 -- on Windows
 local pid = vim.fn.getpid()
 local omnisharp_bin = "C:\\Program Files\\omnisharp\\OmniSharp.exe"
-lspconfig['omnisharp'].setup{
-    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) };
+lspconfig['omnisharp'].setup {
+    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
+    on_attach = custom_on_attach,
 }
 
 vim.diagnostic.config {
