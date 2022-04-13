@@ -2,16 +2,18 @@ require('plugins')
 require('global-options')
 require('mappings')
 
-local FTDetectGroup = vim.api.nvim_create_augroup("FTDetect", { clear = true })
-vim.api.nvim_create_autocmd(
+local api = vim.api
+local FTDetectGroup = api.nvim_create_augroup("FTDetect", { clear = true })
+api.nvim_create_autocmd(
     { "BufRead", "BufNewFile" },
-    { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx" }}
+    { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl" }}
 )
 
 local global = vim.g
 global.vscode_style = "dark"
 
-vim.cmd([[ colorscheme vscode ]])
+local cmd = vim.cmd
+cmd 'colorscheme vscode'
 
 -- ----------------------------------
 --           fzf.vim
@@ -20,8 +22,8 @@ vim.cmd([[ colorscheme vscode ]])
 -- An action can be a reference to a function that processes selected lines
 local build_quickfix_list = function(lines)
     vim.fn.setqflist(vim.fn.map(vim.fn.copy(lines), '{ "filename": vim.v.val }'))
-    vim.cmd 'copen'
-    vim.cmd 'cc'
+    cmd 'copen'
+    cmd 'cc'
 end
 
 global.fzf_action = {
@@ -32,23 +34,23 @@ global.fzf_action = {
 }
 
 -- Make ag match files content only, not filenames
-vim.cmd(":command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)")
+cmd(":command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)")
 
 -- Customize fzf colors to match your color scheme
 global.fzf_colors = {
-    ['fg'] =        { 'fg', 'Normal' },
-    ['bg'] =        { 'bg', 'Normal' },
-    ['hl'] =        { 'fg', 'Comment' },
-    ['fg+'] =       { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
-    ['bg+'] =       { 'bg', 'CursorLine', 'CursorColumn' },
-    ['hl+'] =       { 'fg', 'Statement' },
-    ['info'] =      { 'fg', 'PreProc' },
-    ['border'] =    { 'fg', 'Ignore' },
-    ['prompt'] =    { 'fg', 'Conditional' },
-    ['pointer'] =   { 'fg', 'Exception' },
-    ['marker'] =    { 'fg', 'Keyword' },
-    ['spinner'] =   { 'fg', 'Label' },
-    ['header'] =    { 'fg', 'Comment' }
+    ['fg']      = { 'fg', 'Normal' },
+    ['bg']      = { 'bg', 'Normal' },
+    ['hl']      = { 'fg', 'Comment' },
+    ['fg+']     = { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
+    ['bg+']     = { 'bg', 'CursorLine', 'CursorColumn' },
+    ['hl+']     = { 'fg', 'Statement' },
+    ['info']    = { 'fg', 'PreProc' },
+    ['border']  = { 'fg', 'Ignore' },
+    ['prompt']  = { 'fg', 'Conditional' },
+    ['pointer'] = { 'fg', 'Exception' },
+    ['marker']  = { 'fg', 'Keyword' },
+    ['spinner'] = { 'fg', 'Label' },
+    ['header']  = { 'fg', 'Comment' }
 }
 
 
@@ -65,21 +67,21 @@ global.fzf_preview_window = { 'right:50%:hidden', 'ctrl-/' }
 --           Nvim LSP client
 -- ----------------------------------
 
-local CursorHoldGroup = vim.api.nvim_create_augroup("LSP", { clear = true })
-vim.api.nvim_create_autocmd("CursorHold", { command = "lua vim.diagnostic.open_float()", group = CursorHoldGroup, pattern = { "*" }})
+local CursorHoldGroup = api.nvim_create_augroup("LSP", { clear = true })
+api.nvim_create_autocmd("CursorHold", { command = "lua vim.diagnostic.open_float()", group = CursorHoldGroup, pattern = { "*" }})
 
 local lspconfig = require("lspconfig")
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 function custom_on_attach(client, bufnr)
-    vim.opt.omnifunc = 'vim.lsp.omnifunc'
+    api.nvim_buf_set_option(bufnrm, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
 
     if client.resolved_capabilities.document_formatting then
-        local LSPFormattingGroup = vim.api.nvim_create_augroup("LSPFormatting")
-        vim.api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
+        local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting")
+        api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 end
 
@@ -128,12 +130,12 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
 -- ----------------------------------
 
 local has_words_before = function()
-  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  local line, col = unpack(api.nvim_win_get_cursor(0))
+  return col ~= 0 and api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
 local feedkey = function(key, mode)
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+  api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
 end
 
 local cmp = require("cmp")
@@ -149,9 +151,6 @@ cmp.setup {
         expand = function(args)
             vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
         end,
-    },
-    completion = {
-        completeopt = 'menu,menuone,noinsert',
     },
     mapping = {
         ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
@@ -209,8 +208,8 @@ null_ls.setup({
     },
     on_attach = function(client)
         if client.resolved_capabilities.document_formatting then
-	    local LSPFormattingGroup = vim.api.nvim_create_augroup("LSPFormatting", { clear = true })
-            vim.api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
+            local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting", { clear = true })
+            api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
         end
     end,
 })

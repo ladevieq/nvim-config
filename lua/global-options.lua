@@ -1,4 +1,5 @@
 local set = vim.opt
+local global = vim.g
 
 -- Save and backup
 -- Protect changes between writes. Default values of
@@ -30,8 +31,8 @@ set.softtabstop = 4
 set.expandtab = true
 set.autoindent = true
 
-vim.g.do_filetype_lua = 1
-vim.g.did_load_filetypes = 0
+global.do_filetype_lua = 1
+global.did_load_filetypes = 0
 
 -- Display location hints
 set.number = true
@@ -111,7 +112,7 @@ set.termguicolors = true
 set.virtualedit = block
 
 -- Set completeopt to have a better completion experience
-set.completeopt = { menu, menuone, noinsert, noselect }
+set.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Avoid showing message extra message when using completion
 set.shortmess:append('c')
