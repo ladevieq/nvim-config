@@ -16,51 +16,24 @@ local cmd = vim.cmd
 cmd 'colorscheme vscode'
 
 -- ----------------------------------
---           fzf.vim
+--           Telescope
 -- ----------------------------------
 
--- An action can be a reference to a function that processes selected lines
-local build_quickfix_list = function(lines)
-    vim.fn.setqflist(vim.fn.map(vim.fn.copy(lines), '{ "filename": vim.v.val }'))
-    cmd 'copen'
-    cmd 'cc'
-end
+local actions = require('telescope.actions')
 
-global.fzf_action = {
-   ['ctrl-q'] = 'call build_quickfix_list',
-   ['ctrl-t'] = 'tab split',
-   ['ctrl-x'] = 'split',
-   ['ctrl-v'] = 'vsplit'
+require('telescope').setup {
+    defaults = {
+        mappings = {
+            i = {
+                ["<esc>"] = actions.close
+            }
+        }
+    }
 }
-
--- Make ag match files content only, not filenames
-cmd(":command! -bang -nargs=* Ag call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)")
-
--- Customize fzf colors to match your color scheme
-global.fzf_colors = {
-    ['fg']      = { 'fg', 'Normal' },
-    ['bg']      = { 'bg', 'Normal' },
-    ['hl']      = { 'fg', 'Comment' },
-    ['fg+']     = { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
-    ['bg+']     = { 'bg', 'CursorLine', 'CursorColumn' },
-    ['hl+']     = { 'fg', 'Statement' },
-    ['info']    = { 'fg', 'PreProc' },
-    ['border']  = { 'fg', 'Ignore' },
-    ['prompt']  = { 'fg', 'Conditional' },
-    ['pointer'] = { 'fg', 'Exception' },
-    ['marker']  = { 'fg', 'Keyword' },
-    ['spinner'] = { 'fg', 'Label' },
-    ['header']  = { 'fg', 'Comment' }
-}
-
-
--- [Buffers] Jump to the existing window if possible
-global.fzf_buffers_jump = true
-global.fzf_layout = { window = { yoffset = 0.85, width = 0.9, height = 0.6 } }
-global.fzf_preview_window = { 'right:50%:hidden', 'ctrl-/' }
+require('telescope').load_extension 'fzf'
 
 -- ----------------------------------
---           ! fzf.vim
+--           ! Telescope
 -- ----------------------------------
 
 -- ----------------------------------
@@ -194,26 +167,7 @@ require'nvim-treesitter.configs'.setup {
 }
 
 
-require('lspfuzzy').setup {}
-
-
--- ----------------------------------
---           null-ls
--- ----------------------------------
-
-local null_ls = require("null-ls")
-null_ls.setup({
-    sources = {
-        null_ls.builtins.formatting.eslint,
-        null_ls.builtins.diagnostics.eslint,
-    },
-    on_attach = function(client)
-        if client.resolved_capabilities.document_formatting then
-            local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting", { clear = true })
-            api.nvim_create_autocmd("BufWritePro", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
-        end
-    end,
-})
+-- require('lspfuzzy').setup {}
 
 
 require('lualine').setup {

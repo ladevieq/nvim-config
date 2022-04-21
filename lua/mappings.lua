@@ -21,9 +21,9 @@ api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
 -- ----------------------------------
 --           fzf.vim
 -- ----------------------------------
-api.nvim_set_keymap('n', '<leader>/', ':Ag<cr>', {})
-api.nvim_set_keymap('n', '<leader>f', ':Files<cr>', {})
-api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
+api.nvim_set_keymap('n', '<leader>/', ':Telescope live_grep<cr>', {})
+api.nvim_set_keymap('n', '<leader>f', ':Telescope find_files<cr>', {})
+api.nvim_set_keymap('n', '<leader>b', ':Telescope buffer<cr>', {})
 
 -- ----------------------------------
 --           lsp client
@@ -35,8 +35,8 @@ function _G.bufferLspMappings(client, bufnr)
     api.nvim_buf_set_keymap(bufnr, 'n', 'K',            '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
     api.nvim_buf_set_keymap(bufnr, 'n', 'gi',           '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
     api.nvim_buf_set_keymap(bufnr, 'n', 'gr',           '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           '<cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           '<cmd>lua vim.lsp.buf.workspace_symbol()<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           ':Telescope lsp_document_symbols<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           ':Telescope lsp_workspace_symbols<CR>', opts)
 
     -- Next/Prev diagnostic
     api.nvim_buf_set_keymap(bufnr, 'n', '[g',           '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)

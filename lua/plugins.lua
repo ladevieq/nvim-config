@@ -13,14 +13,6 @@ Plug 'Mofiqul/vscode.nvim'
 Plug 'machakann/vim-sandwich'
 Plug 'windwp/nvim-autopairs'
 
-Plug('junegunn/fzf', {
-    ['do'] = function()
-        vim.call('fzf#install')
-    end
-})
-Plug 'junegunn/fzf.vim'  -- to enable preview (optional)
-Plug('ojroques/nvim-lspfuzzy', { branch = 'main' })
-
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' }) -- We recommend updating the parsers on update
 
 Plug 'neovim/nvim-lspconfig'
@@ -33,7 +25,9 @@ Plug 'hrsh7th/vim-vsnip'
 Plug 'nvim-lualine/lualine.nvim'
 
 Plug 'nvim-lua/plenary.nvim'
-Plug 'jose-elias-alvarez/null-ls.nvim'
+
+Plug 'nvim-telescope/telescope.nvim'
+Plug('nvim-telescope/telescope-fzf-native.nvim', { ['do'] = 'make' })
 
 Plug 'TimUntersberger/neogit'
 
