@@ -3,6 +3,12 @@ vim.g.mapleader = ' '
 
 local api = vim.api
 
+if vim.fn.has('win32') == 1 then
+    api.nvim_set_keymap('n', '<C-Z>', '<Nop>', {})
+    api.nvim_set_keymap('v', '<C-Z>', '<Nop>', {})
+    api.nvim_set_keymap('i', '<C-Z>', '<Nop>', {})
+end
+
 -- Go down/up in wrapped lines
 api.nvim_set_keymap('n', 'j', 'gj', {})
 api.nvim_set_keymap('n', 'k', 'gk', {})
