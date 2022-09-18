@@ -51,20 +51,30 @@ function custom_on_attach(client, bufnr)
 
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
-
-    if client.resolved_capabilities.document_formatting then
+if client.resolved_capabilities.document_formatting then
         local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting", {})
         api.nvim_create_autocmd("BufWritePre", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 end
 
-local servers = { 'clangd', 'rust_analyzer', 'gopls'}
+local servers = { 'rust_analyzer', 'gopls'}
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = custom_on_attach,
         capabilities = capabilities,
     }
 end
+
+-- Disable clangd auto formatting if there is not .clang-format
+lspconfig['clangd'].setup {
+    on_attach = function(client, bufnr)
+        local cwd = vim.fn['getcwd']()
+        if lspconfig.util.root_pattern(".clang-format")(cwd) ~= nil then
+            custom_on_attach(client, bufnr)
+        end
+    end,
+    capabilities = capabilities,
+}
 
 -- Disable tsserver formating
 lspconfig['tsserver'].setup {
@@ -157,7 +167,7 @@ cmp.setup {
 -- ----------------------------------
 
 require'nvim-treesitter.configs'.setup {
-    ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    ensure_installed = "all",
     highlight = {
         enable = true,              -- false will disable the whole extension
     },
