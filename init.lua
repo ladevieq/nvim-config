@@ -3,38 +3,20 @@ require('global-options')
 require('mappings')
 
 local api = vim.api
+local global = vim.g
+local cmd = vim.cmd
+local env = vim.env
+local fn = vim.fn
+
 local FTDetectGroup = api.nvim_create_augroup("FTDetect", { clear = true })
 api.nvim_create_autocmd(
     { "BufRead", "BufNewFile" },
     { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl" }}
 )
 
-local global = vim.g
 global.vscode_style = "dark"
 
-local cmd = vim.cmd
 cmd 'colorscheme vscode'
-
--- ----------------------------------
---           Telescope
--- ----------------------------------
-
-local actions = require('telescope.actions')
-
-require('telescope').setup {
-    defaults = {
-        mappings = {
-            i = {
-                ["<esc>"] = actions.close
-            }
-        }
-    }
-}
-require('telescope').load_extension 'fzf'
-
--- ----------------------------------
---           ! Telescope
--- ----------------------------------
 
 -- ----------------------------------
 --           Nvim LSP client
@@ -44,20 +26,28 @@ local CursorHoldGroup = api.nvim_create_augroup("LSP", { clear = true })
 api.nvim_create_autocmd("CursorHold", { command = "lua vim.diagnostic.open_float()", group = CursorHoldGroup, pattern = { "*" }})
 
 local lspconfig = require("lspconfig")
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSuuport = true;
 
 function custom_on_attach(client, bufnr)
     api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
-if client.resolved_capabilities.document_formatting then
+    if client.server_capabilities.document_formatting then
         local LSPFormattingGroup = api.nvim_create_augroup("LSPFormatting", {})
         api.nvim_create_autocmd("BufWritePre", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
+
+
+    if client.server_capabilities.document_highlight then
+        local DocumentHighlightGroup = api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
+        api.nvim_create_autocmd("CursorHold", { command = "lua vim.lsp.buf.document_highlight()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
+        api.nvim_create_autocmd("CursorMoved", { command = "lua vim.lsp.buf.clear_references()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
+    end
 end
 
-local servers = { 'rust_analyzer', 'gopls'}
+local servers = { 'rust_analyzer', 'gopls', 'cmake'}
 for _, lsp in ipairs(servers) do
     lspconfig[lsp].setup {
         on_attach = custom_on_attach,
@@ -67,11 +57,11 @@ end
 
 -- Disable clangd auto formatting if there is not .clang-format
 lspconfig['clangd'].setup {
+    cmd = { "clangd", "--completion-style=detailed" },
     on_attach = function(client, bufnr)
         local cwd = vim.fn['getcwd']()
-        if lspconfig.util.root_pattern(".clang-format")(cwd) ~= nil then
-            custom_on_attach(client, bufnr)
-        end
+        client.server_capabilities.document_formating = lspconfig.util.root_pattern(".clang-format")(cwd) ~= nil
+        custom_on_attach(client, bufnr)
     end,
     capabilities = capabilities,
 }
@@ -79,8 +69,8 @@ lspconfig['clangd'].setup {
 -- Disable tsserver formating
 lspconfig['tsserver'].setup {
     on_attach = function(client, bufnr)
-        client.resolved_capabilities.document_formatting = false
-        client.resolved_capabilities.document_range_formatting = false
+        client.server_capabilities.document_formatting = false
+        client.server_capabilities.document_range_formatting = false
 
         custom_on_attach(client, bufnr)
     end,
@@ -136,9 +126,10 @@ cmp.setup {
             vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
         end,
     },
-    mapping = {
-        ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-        ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+    mapping = cmp.mapping.preset.insert({
+        ['<Tab>'] = cmp.mapping.scroll_docs(-4),
+        ['<S-Tab>'] = cmp.mapping.scroll_docs(4),
+        ['<C-e>'] = cmp.mapping.abort(),
         ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ['<Tab>'] = cmp.mapping(function(fallback)
             if cmp.visible() then
@@ -158,7 +149,7 @@ cmp.setup {
                 feedkey("<Plug>(vsnip-jump-prev)", "")
             end
         end, { "i", "s" }),
-    },
+    }),
 }
 
 
@@ -175,9 +166,6 @@ require'nvim-treesitter.configs'.setup {
         enable = true,
     },
 }
-
-
--- require('lspfuzzy').setup {}
 
 
 require('lualine').setup {
@@ -210,11 +198,52 @@ require('lualine').setup {
     }
 }
 
+
 require('nvim-autopairs').setup {}
 
 
 -- ----------------------------------
---           Neogit
+--           FZF
 -- ----------------------------------
 
-require('neogit').setup {}
+-- env.FZF_DEFAULT_COMMAND = 'fd'
+global.fzf_buffers_jump = 1
+global.fzf_preview_bash = 'C:\\Program\\\\ Files\\Git\\usr\\bin\\bash.exe'
+api.nvim_create_user_command(
+    'Rg',
+    "call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)",
+    {
+        bang = true,
+        nargs = '*',
+    }
+)
+
+local build_quickfix_list = function(lines)
+    fn.setqflist(fn.map(fn.copy(lines), '{ "filename": v:val, "lnum": 1 }'))
+    cmd 'copen'
+    cmd 'cc'
+end
+
+global.fzf_preview_window = { 'right,50%', 'ctrl-/' }
+global.fzf_action = {
+    ['ctrl-q'] = 'call build_quickfix_list',
+    ['ctrl-t'] = 'tab split',
+    ['ctrl-x'] = 'split',
+    ['ctrl-v'] = 'vsplit'
+}
+global.fzf_layout = { window = { width = 0.6, height = 0.8 } }
+global.fzf_colors = {
+    ['fg'] =      { 'fg', 'Normal' },
+    ['bg'] =      { 'bg', 'Normal' },
+    ['hl'] =      { 'fg', 'Comment' },
+    ['fg+'] =     { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
+    ['bg+'] =     { 'bg', 'CursorLine', 'CursorColumn' },
+    ['hl+'] =     { 'fg', 'Statement' },
+    ['info'] =    { 'fg', 'PreProc' },
+    ['border'] =  { 'fg', 'Ignore' },
+    ['prompt'] =  { 'fg', 'Conditional' },
+    ['pointer'] = { 'fg', 'Exception' },
+    ['marker'] =  { 'fg', 'Keyword' },
+    ['spinner'] = { 'fg', 'Label' },
+    ['header'] =  { 'fg', 'Comment' }
+}

@@ -21,15 +21,16 @@ Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 
 Plug 'nvim-lualine/lualine.nvim'
 
-Plug 'nvim-lua/plenary.nvim'
-
-Plug 'nvim-telescope/telescope.nvim'
-Plug('nvim-telescope/telescope-fzf-native.nvim', { ['do'] = 'make' })
-
-Plug 'TimUntersberger/neogit'
+Plug('junegunn/fzf', {
+    ['do'] = function()
+        vim.call('fzf#install')
+    end
+})
+Plug 'junegunn/fzf.vim'  -- to enable preview (optional)
 
 Plug 'dstein64/vim-startuptime'
 

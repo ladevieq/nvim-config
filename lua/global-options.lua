@@ -86,7 +86,9 @@ set.foldenable = false
 
 -- Change diff algorithm
 if set.diff:get() then
-    set.diffopt = 'filler, context:99999999'
+    set.diffopt = 'filler'
+    set.diffopt:append('context:99999999')
+    set.diffopt:append('linematch:60')
     set.fillchars:append('diff: ,')
     set.relativenumber = false
 
@@ -116,3 +118,6 @@ set.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Avoid showing message extra message when using completion
 set.shortmess:append('c')
+
+-- Allows easy find and replace throught the whole project
+set.grepprg = 'rg --vimgrep --smart-case --follow'

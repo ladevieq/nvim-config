@@ -27,9 +27,9 @@ api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
 -- ----------------------------------
 --           fzf.vim
 -- ----------------------------------
-api.nvim_set_keymap('n', '<leader>/', ':Telescope live_grep<cr>', {})
-api.nvim_set_keymap('n', '<leader>f', ':Telescope find_files<cr>', {})
-api.nvim_set_keymap('n', '<leader>b', ':Telescope buffer<cr>', {})
+api.nvim_set_keymap('n', '<leader>/', ':Ag<cr>', {})
+api.nvim_set_keymap('n', '<leader>f', ':Files<cr>', {})
+api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 
 -- ----------------------------------
 --           lsp client
