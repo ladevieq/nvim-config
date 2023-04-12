@@ -27,7 +27,7 @@ api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
 -- ----------------------------------
 --           fzf.vim
 -- ----------------------------------
-api.nvim_set_keymap('n', '<leader>/', ':Ag<cr>', {})
+api.nvim_set_keymap('n', '<leader>/', ':Rg<cr>', {})
 api.nvim_set_keymap('n', '<leader>f', ':Files<cr>', {})
 api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 

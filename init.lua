@@ -208,10 +208,21 @@ require('nvim-autopairs').setup {}
 
 -- env.FZF_DEFAULT_COMMAND = 'fd'
 global.fzf_buffers_jump = 1
-global.fzf_preview_bash = 'C:\\Program\\\\ Files\\Git\\usr\\bin\\bash.exe'
+api.nvim_create_user_command(
+    'Ag',
+    'call fzf#vim#ag(<q-args>, { "options" : "--delimiter : --nth 4.."}, <bang>0)',
+    {
+        bang = true,
+        nargs = '*',
+    }
+)
 api.nvim_create_user_command(
     'Rg',
-    "call fzf#vim#ag(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)",
+    'call '..
+        'fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>),'..
+        '1,'..
+        '{"options": "--delimiter : --nth 4.."},'..
+        '<bang>0)',
     {
         bang = true,
         nargs = '*',
@@ -224,7 +235,7 @@ local build_quickfix_list = function(lines)
     cmd 'cc'
 end
 
-global.fzf_preview_window = { 'right,50%', 'ctrl-/' }
+global.fzf_preview_window = { 'hidden,right,50%', 'ctrl-/' }
 global.fzf_action = {
     ['ctrl-q'] = 'call build_quickfix_list',
     ['ctrl-t'] = 'tab split',
