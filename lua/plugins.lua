@@ -25,6 +25,8 @@ Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 
 Plug 'nvim-lualine/lualine.nvim'
 
+Plug 'p00f/clangd_extensions.nvim'
+
 Plug('junegunn/fzf', {
     ['do'] = function()
         vim.call('fzf#install')

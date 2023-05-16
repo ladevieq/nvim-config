@@ -14,9 +14,7 @@ api.nvim_create_autocmd(
     { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl" }}
 )
 
-global.vscode_style = "dark"
-
-cmd 'colorscheme vscode'
+require('vscode').load()
 
 -- ----------------------------------
 --           Nvim LSP client
@@ -27,7 +25,7 @@ api.nvim_create_autocmd("CursorHold", { command = "lua vim.diagnostic.open_float
 
 local lspconfig = require("lspconfig")
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSuuport = true;
+capabilities.textDocument.completion.completionItem.snippetSupport = true;
 
 function custom_on_attach(client, bufnr)
     api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -39,11 +37,14 @@ function custom_on_attach(client, bufnr)
         api.nvim_create_autocmd("BufWritePre", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 
-
     if client.server_capabilities.document_highlight then
         local DocumentHighlightGroup = api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
         api.nvim_create_autocmd("CursorHold", { command = "lua vim.lsp.buf.document_highlight()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
         api.nvim_create_autocmd("CursorMoved", { command = "lua vim.lsp.buf.clear_references()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
+    end
+
+    if client.server_capabilities.semanticTokensProvider then
+        print("semantic tokens supported")
     end
 end
 
@@ -116,9 +117,10 @@ local cmp = require("cmp")
 
 cmp.setup {
     sources = cmp.config.sources({
-        { name = 'vsnip' }, -- For vsnip users.
         { name = 'nvim_lsp' },
-        { name = 'path' }
+        { name = 'vsnip' }, -- For vsnip users.
+        { name = 'path' },
+        { name = 'nvim_lsp_signature_help' },
     }),
     snippet = {
         -- REQUIRED - you must specify a snippet engine
@@ -149,6 +151,7 @@ cmp.setup {
                 feedkey("<Plug>(vsnip-jump-prev)", "")
             end
         end, { "i", "s" }),
+        ['<C-e>'] = cmp.mapping.abort(),
     }),
 }
 
@@ -206,7 +209,6 @@ require('nvim-autopairs').setup {}
 --           FZF
 -- ----------------------------------
 
--- env.FZF_DEFAULT_COMMAND = 'fd'
 global.fzf_buffers_jump = 1
 api.nvim_create_user_command(
     'Ag',
@@ -235,6 +237,7 @@ local build_quickfix_list = function(lines)
     cmd 'cc'
 end
 
+global.fzf_files_options = {}
 global.fzf_preview_window = { 'hidden,right,50%', 'ctrl-/' }
 global.fzf_action = {
     ['ctrl-q'] = 'call build_quickfix_list',
@@ -258,3 +261,5 @@ global.fzf_colors = {
     ['spinner'] = { 'fg', 'Label' },
     ['header'] =  { 'fg', 'Comment' }
 }
+
+require("clangd_extensions").prepare()
