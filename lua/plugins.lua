@@ -8,7 +8,7 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
-Plug 'Mofiqul/vscode.nvim'
+Plug 'projekt0n/github-nvim-theme'
 
 Plug 'machakann/vim-sandwich'
 Plug 'windwp/nvim-autopairs'

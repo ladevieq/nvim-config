@@ -11,10 +11,10 @@ local fn = vim.fn
 local FTDetectGroup = api.nvim_create_augroup("FTDetect", { clear = true })
 api.nvim_create_autocmd(
     { "BufRead", "BufNewFile" },
-    { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl" }}
+    { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl", "*.comp" }}
 )
 
-require('vscode').load()
+cmd [[colorscheme github_dark_colorblind]]
 
 -- ----------------------------------
 --           Nvim LSP client
@@ -41,10 +41,6 @@ function custom_on_attach(client, bufnr)
         local DocumentHighlightGroup = api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
         api.nvim_create_autocmd("CursorHold", { command = "lua vim.lsp.buf.document_highlight()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
         api.nvim_create_autocmd("CursorMoved", { command = "lua vim.lsp.buf.clear_references()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
-    end
-
-    if client.server_capabilities.semanticTokensProvider then
-        print("semantic tokens supported")
     end
 end
 
@@ -79,10 +75,9 @@ lspconfig['tsserver'].setup {
 }
 
 -- on Windows
-local pid = vim.fn.getpid()
 local omnisharp_bin = "C:\\Program Files\\omnisharp\\OmniSharp.exe"
 lspconfig['omnisharp'].setup {
-    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(pid) },
+    cmd = { omnisharp_bin, "--languageserver" , "--hostPID", tostring(vim.fn.getpid()) },
     on_attach = custom_on_attach,
 }
 
@@ -114,8 +109,7 @@ local feedkey = function(key, mode)
 end
 
 local cmp = require("cmp")
-
-cmp.setup {
+cmp.setup({
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
         { name = 'vsnip' }, -- For vsnip users.
@@ -123,17 +117,16 @@ cmp.setup {
         { name = 'nvim_lsp_signature_help' },
     }),
     snippet = {
-        -- REQUIRED - you must specify a snippet engine
         expand = function(args)
             vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
         end,
     },
     mapping = cmp.mapping.preset.insert({
-        ['<Tab>'] = cmp.mapping.scroll_docs(-4),
+        ['<Tab>']   = cmp.mapping.scroll_docs(-4),
         ['<S-Tab>'] = cmp.mapping.scroll_docs(4),
-        ['<C-e>'] = cmp.mapping.abort(),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
-        ['<Tab>'] = cmp.mapping(function(fallback)
+        ['<C-e>']   = cmp.mapping.abort(),
+        ['<CR>']    = cmp.mapping.confirm({ select = true }),
+        ['<Tab>']   = cmp.mapping(function(fallback)
             if cmp.visible() then
                 cmp.select_next_item()
             elseif vim.fn["vsnip#available"](1) == 1 then
@@ -151,9 +144,13 @@ cmp.setup {
                 feedkey("<Plug>(vsnip-jump-prev)", "")
             end
         end, { "i", "s" }),
-        ['<C-e>'] = cmp.mapping.abort(),
+        ['<C-e>']   = cmp.mapping.abort(),
     }),
-}
+    window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+    }
+})
 
 
 -- ----------------------------------
@@ -174,13 +171,17 @@ require'nvim-treesitter.configs'.setup {
 require('lualine').setup {
     options = {
         icons_enabled = false,
-        theme = 'solarized_dark',
         globalstatus = true,
     },
     sections = {
         lualine_a = {'mode'},
         lualine_b = {'branch'},
-        lualine_c = {'filename'},
+        lualine_c = {
+            {
+                'filename',
+                path = 1,
+            }
+        },
         lualine_x = {'encoding', 'fileformat', 'filetype'},
         lualine_y = {'progress'},
         lualine_z = {'location'}
@@ -202,12 +203,16 @@ require('lualine').setup {
 }
 
 
-require('nvim-autopairs').setup {}
+require('nvim-autopairs').setup({})
 
 
 -- ----------------------------------
 --           FZF
 -- ----------------------------------
+
+local FZFGroup = api.nvim_create_augroup("FZF", { clear = true })
+api.nvim_create_autocmd("CursorHold",   { command = "set laststatus=0 noruler", group = FZFGroup, pattern = { "FileType fzf"}})
+api.nvim_create_autocmd("BufLeave",     { command = "set laststatus=2 ruler",   group = FZFGroup, pattern = { "<buffer>"    }})
 
 global.fzf_buffers_jump = 1
 api.nvim_create_user_command(
@@ -237,7 +242,6 @@ local build_quickfix_list = function(lines)
     cmd 'cc'
 end
 
-global.fzf_files_options = {}
 global.fzf_preview_window = { 'hidden,right,50%', 'ctrl-/' }
 global.fzf_action = {
     ['ctrl-q'] = 'call build_quickfix_list',
@@ -245,7 +249,7 @@ global.fzf_action = {
     ['ctrl-x'] = 'split',
     ['ctrl-v'] = 'vsplit'
 }
-global.fzf_layout = { window = { width = 0.6, height = 0.8 } }
+global.fzf_layout = { window = { width = 0.8, height = 0.8, border = 'rounded' } }
 global.fzf_colors = {
     ['fg'] =      { 'fg', 'Normal' },
     ['bg'] =      { 'bg', 'Normal' },
@@ -254,7 +258,7 @@ global.fzf_colors = {
     ['bg+'] =     { 'bg', 'CursorLine', 'CursorColumn' },
     ['hl+'] =     { 'fg', 'Statement' },
     ['info'] =    { 'fg', 'PreProc' },
-    ['border'] =  { 'fg', 'Ignore' },
+    ['gutter'] =  { 'fg', 'Ignore' },
     ['prompt'] =  { 'fg', 'Conditional' },
     ['pointer'] = { 'fg', 'Exception' },
     ['marker'] =  { 'fg', 'Keyword' },
