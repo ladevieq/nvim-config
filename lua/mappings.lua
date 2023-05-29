@@ -41,8 +41,8 @@ function _G.bufferLspMappings(client, bufnr)
     api.nvim_buf_set_keymap(bufnr, 'n', 'K',            '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
     api.nvim_buf_set_keymap(bufnr, 'n', 'gi',           '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
     api.nvim_buf_set_keymap(bufnr, 'n', 'gr',           '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           ':Telescope lsp_document_symbols<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           ':Telescope lsp_workspace_symbols<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           '<cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           '<cmd> lua vim.lsp.buf.workspace_symbol<CR>', opts)
 
     -- Next/Prev diagnostic
     api.nvim_buf_set_keymap(bufnr, 'n', '[g',           '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)

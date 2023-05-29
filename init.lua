@@ -37,9 +37,9 @@ function custom_on_attach(client, bufnr)
         api.nvim_create_autocmd("BufWritePre", { command = "lua vim.lsp.buf.formatting_sync()", group = LSPFormattingGroup, pattern = { "<buffer>" }})
     end
 
-    if client.server_capabilities.document_highlight then
+    if client.server_capabilities.documentHighlightProvider then
         local DocumentHighlightGroup = api.nvim_create_augroup("LSPDocumentHighlight", { clear = true })
-        api.nvim_create_autocmd("CursorHold", { command = "lua vim.lsp.buf.document_highlight()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
+        api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, { command = "lua vim.lsp.buf.document_highlight()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
         api.nvim_create_autocmd("CursorMoved", { command = "lua vim.lsp.buf.clear_references()", group = DocumentHighlightGroup, pattern = { "<buffer>" }})
     end
 end
@@ -233,6 +233,15 @@ api.nvim_create_user_command(
     {
         bang = true,
         nargs = '*',
+    }
+)
+api.nvim_create_user_command(
+    'RAg',
+    "call fzf#vim#ag_raw(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)",
+    {
+        bang = true,
+        nargs = '+',
+        complete = 'dir'
     }
 )
 
