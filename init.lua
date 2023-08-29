@@ -275,4 +275,4 @@ global.fzf_colors = {
     ['header'] =  { 'fg', 'Comment' }
 }
 
-require("clangd_extensions").prepare()
+require("clangd_extensions").setup()
