@@ -30,6 +30,8 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true;
 function custom_on_attach(client, bufnr)
     api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
+    vim.lsp.inlay_hint(bufnr, true)
+
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
     if client.server_capabilities.document_formatting then
@@ -52,6 +54,12 @@ for _, lsp in ipairs(servers) do
     }
 end
 
+lspconfig['cmake'].setup {
+    on_attach = function(client, bufnr)
+        custom_on_attach(client, bufnr)
+    end,
+    capabilities = capabilities,
+}
 -- Disable clangd auto formatting if there is not .clang-format
 lspconfig['clangd'].setup {
     cmd = { "clangd", "--completion-style=detailed" },
@@ -223,13 +231,25 @@ api.nvim_create_user_command(
         nargs = '*',
     }
 )
+
+local rg_call = function(opts)
+    local args = '""'
+    if opts.args ~= nil then
+        args = vim.fn.shellescape(opts.args)
+    end
+    vim.call(
+        'fzf#vim#grep2',
+        'rg --column --line-number --no-heading --color=always --smart-case -g '..vim.fn.shellescape(opts.args),
+        '',
+        1,
+        { options = {"--delimiter", "--nth 4.."}},
+        opts.bang
+    )
+end
+
 api.nvim_create_user_command(
     'Rg',
-    'call '..
-        'fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".shellescape(<q-args>),'..
-        '1,'..
-        '{"options": "--delimiter : --nth 4.."},'..
-        '<bang>0)',
+    rg_call,
     {
         bang = true,
         nargs = '*',
