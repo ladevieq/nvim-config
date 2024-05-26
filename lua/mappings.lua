@@ -27,9 +27,9 @@ api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
 -- ----------------------------------
 --           fzf.vim
 -- ----------------------------------
-api.nvim_set_keymap('n', '<leader>/', ':Rg<cr>', {})
-api.nvim_set_keymap('n', '<leader>f', ':Files<cr>', {})
-api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
+api.nvim_set_keymap('n', '<leader>/', ':FzfLua grep_project<cr>', {})
+api.nvim_set_keymap('n', '<leader>f', ':FzfLua files<cr>', {})
+api.nvim_set_keymap('n', '<leader>b', ':FzfLua buffers<cr>', {})
 
 -- ----------------------------------
 --           lsp client
@@ -37,12 +37,12 @@ api.nvim_set_keymap('n', '<leader>b', ':Buffers<cr>', {})
 function _G.bufferLspMappings(client, bufnr)
     local opts = { noremap = true, silent = true }
     api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn',   '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gd',           '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gd',           '<cmd>FzfLua lsp_definitions<CR>', opts)
     api.nvim_buf_set_keymap(bufnr, 'n', 'K',            '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gi',           '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gr',           '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           '<cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           '<cmd> lua vim.lsp.buf.workspace_symbol<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gi',           '<cmd>FzfLua lsp_implementations<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gr',           '<cmd>FzfLua lsp_references<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gs',           '<cmd>FzfLua lsp_document_symbols<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           '<cmd>FzfLua lsp_live_workspace_symbols<CR>', opts)
 
     -- Next/Prev diagnostic
     api.nvim_buf_set_keymap(bufnr, 'n', '[g',           '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)

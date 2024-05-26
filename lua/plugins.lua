@@ -8,7 +8,7 @@ local Plug = vim.fn['plug#']
 
 vim.call('plug#begin')
 
-Plug 'projekt0n/github-nvim-theme'
+Plug 'andreasvc/vim-256noir'
 
 Plug 'machakann/vim-sandwich'
 Plug 'windwp/nvim-autopairs'
@@ -23,16 +23,12 @@ Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
 
-Plug 'nvim-lualine/lualine.nvim'
-
-Plug 'p00f/clangd_extensions.nvim'
-
 Plug('junegunn/fzf', {
     ['do'] = function()
         vim.call('fzf#install')
     end
 })
-Plug 'junegunn/fzf.vim'  -- to enable preview (optional)
+Plug 'ibhagwan/fzf-lua'
 
 Plug 'dstein64/vim-startuptime'
 

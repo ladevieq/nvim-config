@@ -14,7 +14,7 @@ api.nvim_create_autocmd(
     { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl", "*.comp" }}
 )
 
-cmd [[colorscheme github_dark_colorblind]]
+cmd [[colorscheme 256_noir]]
 
 -- ----------------------------------
 --           Nvim LSP client
@@ -175,42 +175,6 @@ require'nvim-treesitter.configs'.setup {
     },
 }
 
-
-require('lualine').setup {
-    options = {
-        icons_enabled = false,
-        globalstatus = true,
-    },
-    sections = {
-        lualine_a = {'mode'},
-        lualine_b = {'branch'},
-        lualine_c = {
-            {
-                'filename',
-                path = 1,
-            }
-        },
-        lualine_x = {'encoding', 'fileformat', 'filetype'},
-        lualine_y = {'progress'},
-        lualine_z = {'location'}
-    },
-    tabline = {
-        lualine_a = {
-            {
-                'tabs',
-                max_length = vim.o.columns,
-                mode = 1,
-            }
-        },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = {},
-        lualine_y = {},
-        lualine_z = {}
-    }
-}
-
-
 require('nvim-autopairs').setup({
     "windwp/nvim-autopairs",
     dependencies = {
@@ -242,86 +206,3 @@ cmp.event:on(
   'confirm_done',
   cmp_autopairs.on_confirm_done()
 )
-
--- ----------------------------------
---           FZF
--- ----------------------------------
-
-local FZFGroup = api.nvim_create_augroup("FZF", { clear = true })
-api.nvim_create_autocmd("CursorHold",   { command = "set laststatus=0 noruler", group = FZFGroup, pattern = { "FileType fzf"}})
-api.nvim_create_autocmd("BufLeave",     { command = "set laststatus=2 ruler",   group = FZFGroup, pattern = { "<buffer>"    }})
-
-global.fzf_buffers_jump = 1
-api.nvim_create_user_command(
-    'Ag',
-    'call fzf#vim#ag(<q-args>, { "options" : "--delimiter : --nth 4.."}, <bang>0)',
-    {
-        bang = true,
-        nargs = '*',
-    }
-)
-
-local rg_call = function(opts)
-    local args = '""'
-    if opts.args ~= nil then
-        args = vim.fn.shellescape(opts.args)
-    end
-    vim.call(
-        'fzf#vim#grep2',
-        'rg --column --line-number --no-heading --color=always --smart-case -g '..vim.fn.shellescape(opts.args),
-        '',
-        1,
-        { options = {"--delimiter", "--nth 4.."}},
-        opts.bang
-    )
-end
-
-api.nvim_create_user_command(
-    'Rg',
-    rg_call,
-    {
-        bang = true,
-        nargs = '*',
-    }
-)
-api.nvim_create_user_command(
-    'RAg',
-    "call fzf#vim#ag_raw(<q-args>, { 'options' : '--delimiter : --nth 4..'}, <bang>0)",
-    {
-        bang = true,
-        nargs = '+',
-        complete = 'dir'
-    }
-)
-
-local build_quickfix_list = function(lines)
-    fn.setqflist(fn.map(fn.copy(lines), '{ "filename": v:val, "lnum": 1 }'))
-    cmd 'copen'
-    cmd 'cc'
-end
-
-global.fzf_preview_window = { 'hidden,right,50%', 'ctrl-/' }
-global.fzf_action = {
-    ['ctrl-q'] = 'call build_quickfix_list',
-    ['ctrl-t'] = 'tab split',
-    ['ctrl-x'] = 'split',
-    ['ctrl-v'] = 'vsplit'
-}
-global.fzf_layout = { window = { width = 0.8, height = 0.8, border = 'rounded' } }
-global.fzf_colors = {
-    ['fg'] =      { 'fg', 'Normal' },
-    ['bg'] =      { 'bg', 'Normal' },
-    ['hl'] =      { 'fg', 'Comment' },
-    ['fg+'] =     { 'fg', 'CursorLine', 'CursorColumn', 'Normal' },
-    ['bg+'] =     { 'bg', 'CursorLine', 'CursorColumn' },
-    ['hl+'] =     { 'fg', 'Statement' },
-    ['info'] =    { 'fg', 'PreProc' },
-    ['gutter'] =  { 'fg', 'Ignore' },
-    ['prompt'] =  { 'fg', 'Conditional' },
-    ['pointer'] = { 'fg', 'Exception' },
-    ['marker'] =  { 'fg', 'Keyword' },
-    ['spinner'] = { 'fg', 'Label' },
-    ['header'] =  { 'fg', 'Comment' }
-}
-
-require("clangd_extensions").setup()
