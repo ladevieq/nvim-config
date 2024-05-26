@@ -30,7 +30,7 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true;
 function custom_on_attach(client, bufnr)
     api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-    vim.lsp.inlay_hint(bufnr, true)
+    vim.lsp.inlay_hint.enable(true, nil, bufnr)
 
     -- Setup mappings only for buffer with a server
     bufferLspMappings(client, bufnr)
