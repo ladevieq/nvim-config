@@ -53,3 +53,5 @@ function _G.bufferLspMappings(client, bufnr)
     -- Restart client
     api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rr',   '<cmd>lua vim.lsp.stop_client(vim.lsp.get_active_clients())<CR>', opts)
 end
+
+api.nvim_set_keymap('n', '<F5>', '<cmd>silent AsyncRun -program=make<cr>', {})

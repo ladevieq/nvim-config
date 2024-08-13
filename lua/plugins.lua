@@ -30,6 +30,8 @@ Plug('junegunn/fzf', {
 })
 Plug 'ibhagwan/fzf-lua'
 
+Plug 'skywind3000/asyncrun.vim'
+
 Plug 'dstein64/vim-startuptime'
 
 vim.call('plug#end')

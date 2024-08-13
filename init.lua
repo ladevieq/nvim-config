@@ -3,15 +3,24 @@ require('global-options')
 require('mappings')
 
 local api = vim.api
-local global = vim.g
 local cmd = vim.cmd
-local env = vim.env
 local fn = vim.fn
 
 local FTDetectGroup = api.nvim_create_augroup("FTDetect", { clear = true })
 api.nvim_create_autocmd(
     { "BufRead", "BufNewFile" },
     { command = "setfiletype glsl", group = FTDetectGroup, pattern = { "*.fx", "*.hlsl", "*.comp" }}
+)
+
+api.nvim_create_autocmd(
+    { "VimEnter" },
+    { callback = function()
+            local stat = vim.loop.fs_stat(vim.fn.getcwd().."\\build.bat")
+            if stat and stat.type or false then
+                vim.opt.makeprg = 'build.bat'
+            end
+        end,
+    }
 )
 
 cmd [[colorscheme 256_noir]]
