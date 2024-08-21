@@ -18,6 +18,7 @@ api.nvim_create_autocmd(
             local stat = vim.loop.fs_stat(vim.fn.getcwd().."\\build.bat")
             if stat and stat.type or false then
                 vim.opt.makeprg = 'build.bat'
+                api.nvim_set_keymap('n', '<F5>', '<cmd>silent vert copen 75 | AsyncRun -program=make<cr>', {})
             end
         end,
     }
