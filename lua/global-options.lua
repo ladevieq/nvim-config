@@ -121,3 +121,7 @@ set.shortmess:append('c')
 
 -- Allows easy find and replace throught the whole project
 set.grepprg = 'rg --vimgrep --smart-case --follow'
+
+if vim.fn.has('win32') == 1 then
+    set.shell = 'powershell.exe'
+end
