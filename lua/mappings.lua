@@ -58,3 +58,6 @@ end
 --           terminal
 -- ----------------------------------
 api.nvim_set_keymap('t', 'jk', '<C-\\><C-N>', {})
+
+local cmd = '<cmd>silent vert copen '..math.floor(vim.o.columns * 0.45)..' | AsyncRun -program=make<cr>'
+api.nvim_set_keymap('n', '<F5>', cmd, {})
