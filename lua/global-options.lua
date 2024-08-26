@@ -123,5 +123,5 @@ set.shortmess:append('c')
 set.grepprg = 'rg --vimgrep --smart-case --follow'
 
 if vim.fn.has('win32') == 1 then
-    set.shell = 'powershell.exe'
+    global.terminal_emulator = 'powershell'
 end
