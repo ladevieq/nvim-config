@@ -125,3 +125,5 @@ set.grepprg = 'rg --vimgrep --smart-case --follow'
 if vim.fn.has('win32') == 1 then
     global.terminal_emulator = 'powershell'
 end
+
+global.editorconfig = false

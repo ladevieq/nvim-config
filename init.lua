@@ -215,3 +215,14 @@ cmp.event:on(
   'confirm_done',
   cmp_autopairs.on_confirm_done()
 )
+
+
+local fzf_lua = require('fzf-lua')
+fzf_lua.setup {
+    files = {
+        fd_opts           = [[--color=never --type f --hidden --follow -E .git -E .cache -E .vs -E Intermediate]]
+    },
+    grep = {
+        rg_glob = true
+    }
+}

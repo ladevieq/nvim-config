@@ -10,8 +10,8 @@ if vim.fn.has('win32') == 1 then
 end
 
 -- Go down/up in wrapped lines
-api.nvim_set_keymap('n', 'j', 'gj', {})
-api.nvim_set_keymap('n', 'k', 'gk', {})
+-- api.nvim_set_keymap('n', 'j', 'gj', {})
+-- api.nvim_set_keymap('n', 'k', 'gk', {})
 
 -- Easier to escape the insert mode and terminal mode
 api.nvim_set_keymap('i', 'jk', '<Esc>', {})
@@ -27,8 +27,21 @@ api.nvim_set_keymap('n', '<leader>t', '<C-W><C-T>', {})
 -- ----------------------------------
 --           fzf.vim
 -- ----------------------------------
-api.nvim_set_keymap('n', '<leader>/', ':FzfLua grep_project<cr>', {})
-api.nvim_set_keymap('n', '<leader>f', ':FzfLua files<cr>', {})
+api.nvim_set_keymap('n', '<leader>/', ':FzfLua live_grep_native<cr>', {})
+
+api.nvim_create_user_command('FD', function(opts)
+    local fzf_lua = require'fzf-lua'
+    local args = fzf_lua.config.setup_opts.files.fd_opts.." "..opts.args
+    fzf_lua.fzf_exec(
+        "fd "..args,
+        {
+            cwd = fzf_lua.config.cwd,
+            actions = fzf_lua.defaults.actions.files
+        }
+    )
+end, { nargs='*' })
+api.nvim_set_keymap('n', '<leader>f', ':FD<cr>', {})
+
 api.nvim_set_keymap('n', '<leader>b', ':FzfLua buffers<cr>', {})
 
 -- ----------------------------------
