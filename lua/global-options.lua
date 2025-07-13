@@ -1,6 +1,9 @@
 local set = vim.opt
 local global = vim.g
 
+-- Set leader key
+global.mapleader = ' '
+
 -- Save and backup
 -- Protect changes between writes. Default values of
 -- updatecount (200 keystrokes) and updatetime
@@ -29,10 +32,6 @@ end
 set.shiftwidth = 4
 set.softtabstop = 4
 set.expandtab = true
-set.autoindent = true
-
-global.do_filetype_lua = 1
-global.did_load_filetypes = 0
 
 -- Display location hints
 set.number = true
@@ -65,8 +64,6 @@ set.wildmenu = true
 set.splitbelow = true
 set.splitright = true
 
-set.autoread = true
-
 -- Better display for messages
 set.cmdheight = 2
 
@@ -75,10 +72,6 @@ set.signcolumn = 'yes'
 
 -- Hide mode
 set.showmode = false
-
--- Search
-set.incsearch = true
-set.hlsearch = true
 
 set.scrolloff = 10 -- show lines above and below cursor
 
@@ -99,17 +92,12 @@ end
 
 -- Timeouts
 set.timeout = true
-set.timeoutlen = 250
-set.ttimeout = true
+set.timeoutlen = 150
 set.ttimeoutlen = 100
-set.updatetime = 300
+set.updatetime = 1000
 
 -- Use system clipboard
 set.clipboard = 'unnamedplus'
-
-vim.cmd 'syntax on'
-
-set.termguicolors = true
 
 set.virtualedit = block
 
@@ -122,8 +110,16 @@ set.shortmess:append('c')
 -- Allows easy find and replace throught the whole project
 set.grepprg = 'rg --vimgrep --smart-case --follow'
 
+-- Use and set powershell options if it is installed
 if vim.fn.has('win32') == 1 then
-    global.terminal_emulator = 'powershell'
+    global.terminal_emulator = vim.fn.executable 'pwsh' == 1 and 'pwsh' or 'powershell'
+
+    set.shell = vim.fn.executable 'pwsh' == 1 and 'pwsh' or 'powershell'
+    set.shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;'
+    set.shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait'
+    set.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
+    set.shellquote = ""
+    set.shellxquote= ""
 end
 
 global.editorconfig = false
