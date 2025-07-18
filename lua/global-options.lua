@@ -99,6 +99,8 @@ set.updatetime = 1000
 -- Use system clipboard
 set.clipboard = 'unnamedplus'
 
+set.termguicolors = true
+
 set.virtualedit = block
 
 -- Set completeopt to have a better completion experience

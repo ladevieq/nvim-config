@@ -73,7 +73,6 @@ require'nvim-treesitter.configs'.setup {
 }
 
 require('nvim-autopairs').setup({
-    "windwp/nvim-autopairs",
     event = "InsertEnter",
     opts = {},
     config = function(_, opts)
