@@ -93,7 +93,7 @@ end
 -- Timeouts
 set.timeout = true
 set.timeoutlen = 150
-set.ttimeoutlen = 100
+set.ttimeoutlen = 150
 set.updatetime = 1000
 
 -- Use system clipboard

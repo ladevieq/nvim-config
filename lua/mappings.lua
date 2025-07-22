@@ -58,8 +58,12 @@ api.nvim_set_keymap('n', '<leader>b', ':FzfLua buffers<cr>', {})
 function _G.buffer_lsp_mappings(client, bufnr)
     local opts = { noremap = true, silent = true }
 
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gd',           '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    api.nvim_buf_set_keymap(bufnr, 'n', 'gw',           '<cmd>FzfLua lsp_live_workspace_symbols<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>FzfLua lsp_definitions<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>FzfLua lsp_references<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>FzfLua lsp_implementations<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gt', '<cmd>FzfLua lsp_typedefs<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'go', '<cmd>FzfLua lsp_document_symbols<CR>', opts)
+    api.nvim_buf_set_keymap(bufnr, 'n', 'gw', '<cmd>FzfLua lsp_live_workspace_symbols<CR>', opts)
 
     -- Restart client
     api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rr',   '<cmd>lua vim.lsp.stop_client(vim.lsp.get_clients()) | edit <CR>', opts)
